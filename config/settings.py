@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     "rest_framework",
     "users",
     "education",
+    "django_filters",
 ]
 AUTH_USER_MODEL = "users.User"
 
