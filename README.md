@@ -8,6 +8,7 @@ pip install --upgrade pip
 pip install django djangorestframework
 pip install pillow
 
+pip install flake8
 
 после установки каждой зависимости 
 вводим команду pip freeze для добавления 
@@ -25,3 +26,4 @@ pip install psycopg2-binary
 python manage.py startapp users
 python manage.py startapp education
 
+pip install djangorestframework-simplejwt
