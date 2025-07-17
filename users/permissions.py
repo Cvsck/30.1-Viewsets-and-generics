@@ -3,12 +3,9 @@ from rest_framework.permissions import BasePermission
 
 class IsModerator(BasePermission):
     def has_permission(self, request, view):
-        return request.user.groups.filter(name="moderators").exists()
-
-
-class IsNotModerator(BasePermission):
-    def has_permission(self, request, view):
-        return not request.user.groups.filter(name="moderators").exists()
+        is_mod = request.user.groups.filter(name="moderators").exists()
+        print("IsModerator =", is_mod)
+        return is_mod
 
 
 class IsOwner(BasePermission):

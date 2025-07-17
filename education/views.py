@@ -2,31 +2,43 @@ from rest_framework import viewsets, generics
 from rest_framework.permissions import IsAuthenticated
 from .models import Course, Lesson
 from .serializers import CourseSerializer, LessonSerializer
-from users.permissions import IsModerator, IsOwner  # кастомные права
+from users.permissions import IsModerator, IsOwner
 
 
-# 🔹 ViewSet: CRUD для курсов
 class CourseViewSet(viewsets.ModelViewSet):
     queryset = Course.objects.all()
     serializer_class = CourseSerializer
-    permission_classes = [IsAuthenticated, IsModerator | IsOwner]  # защита
+
+    def get_permissions(self):
+        if self.request.method == "POST":
+            return [IsAuthenticated(), (~IsModerator)()]  # запрет модератору
+        return [IsAuthenticated()]
 
     def perform_create(self, serializer):
-        serializer.save(owner=self.request.user)  # владелец при создании
+        serializer.save(owner=self.request.user)
 
 
-# 🔹 List + Create: уроки
 class LessonListCreate(generics.ListCreateAPIView):
     queryset = Lesson.objects.all()
     serializer_class = LessonSerializer
-    permission_classes = [IsAuthenticated]
+
+    def get_permissions(self):
+        if self.request.method == "POST":
+            return [IsAuthenticated(), (~IsModerator)()]
+        return [IsAuthenticated()]
 
     def perform_create(self, serializer):
-        serializer.save(owner=self.request.user)  # привязка владельца
+        serializer.save(owner=self.request.user)
 
 
-# 🔹 Retrieve + Update + Delete: конкретный урок
 class LessonRetrieveUpdateDelete(generics.RetrieveUpdateDestroyAPIView):
     queryset = Lesson.objects.all()
     serializer_class = LessonSerializer
-    permission_classes = [IsAuthenticated, IsModerator | IsOwner]  # гибкий доступ
+    permission_classes = [IsAuthenticated, IsModerator | IsOwner]
+
+    def get_permissions(self):
+        if self.request.method == "DELETE":
+            permission_classes = [IsAuthenticated, IsOwner]
+        else:
+            permission_classes = self.permission_classes
+        return [permission() for permission in permission_classes]
