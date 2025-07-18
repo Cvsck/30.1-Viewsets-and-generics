@@ -10,9 +10,15 @@ class CourseViewSet(viewsets.ModelViewSet):
     serializer_class = CourseSerializer
 
     def get_permissions(self):
-        if self.request.method == "POST":
-            return [IsAuthenticated(), (~IsModerator)()]  # запрет модератору
-        return [IsAuthenticated()]
+        if self.action == "create":
+            permission_classes = [IsAuthenticated, ~IsModerator]
+        elif self.action == "destroy":
+            permission_classes = [IsAuthenticated, IsOwner]
+        elif self.action in ["retrieve", "update", "partial_update"]:
+            permission_classes = [IsAuthenticated, IsModerator | IsOwner]
+        else:
+            permission_classes = [IsAuthenticated]
+        return [permission() for permission in permission_classes]
 
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
@@ -24,8 +30,10 @@ class LessonListCreate(generics.ListCreateAPIView):
 
     def get_permissions(self):
         if self.request.method == "POST":
-            return [IsAuthenticated(), (~IsModerator)()]
-        return [IsAuthenticated()]
+            permission_classes = [IsAuthenticated, ~IsModerator]
+        else:
+            permission_classes = [IsAuthenticated]
+        return [permission() for permission in permission_classes]
 
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)

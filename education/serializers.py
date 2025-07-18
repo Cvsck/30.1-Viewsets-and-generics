@@ -6,11 +6,12 @@ class LessonSerializer(serializers.ModelSerializer):
     class Meta:
         model = Lesson
         fields = ["id", "title", "course", "description", "video_url"]
+        read_only_fields = ["id"]
 
 
 class FullCourseSerializer(serializers.ModelSerializer):
     lessons_count = serializers.SerializerMethodField()
-    lessons = LessonSerializer(source="lessons", many=True)
+    lessons = LessonSerializer(many=True, read_only=True)
 
     def get_lessons_count(self, instance):
         return instance.lessons.count()
@@ -18,6 +19,7 @@ class FullCourseSerializer(serializers.ModelSerializer):
     class Meta:
         model = Course
         fields = ["id", "title", "description", "lessons_count", "lessons"]
+        read_only_fields = ["id", "lessons_count", "lessons"]
 
 
 class CourseSerializer(serializers.ModelSerializer):
@@ -30,3 +32,4 @@ class CourseSerializer(serializers.ModelSerializer):
     class Meta:
         model = Course
         fields = ["id", "title", "description", "lessons_count"]
+        read_only_fields = ["id", "lessons_count"]
