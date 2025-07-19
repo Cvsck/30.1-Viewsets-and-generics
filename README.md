@@ -8,7 +8,21 @@ pip install --upgrade pip
 pip install django djangorestframework
 pip install pillow
 
-pip install flake8
+pip install mypy flake8 black isort
+
+
+# mypy: проверка типов
+mypy .
+
+# flake8: стиль и ошибки
+flake8 .
+
+# black: автоформатирование
+black .
+
+# isort: сортировка импортов
+isort .
+
 
 после установки каждой зависимости 
 вводим команду pip freeze для добавления 

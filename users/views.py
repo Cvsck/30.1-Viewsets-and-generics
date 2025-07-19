@@ -1,10 +1,12 @@
-from rest_framework import generics, viewsets, filters
-from rest_framework.permissions import AllowAny, IsAuthenticated
-from django_filters.rest_framework import DjangoFilterBackend
 from django.contrib.auth import get_user_model
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework import filters, generics, viewsets
+from rest_framework.permissions import AllowAny, IsAuthenticated
+
 from users.permissions import IsModerator, IsOwner
+
 from .models import Payment
-from .serializers import UserSerializer, RegisterSerializer, PaymentSerializer
+from .serializers import PaymentSerializer, RegisterSerializer, UserSerializer
 
 User = get_user_model()
 

@@ -1,11 +1,12 @@
-from django.urls import path, include
+from django.urls import include, path
 from rest_framework.routers import DefaultRouter
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
+
 from .views import (
-    UserListCreateView,
-    UserDetailView,
     PaymentViewSet,
     RegisterAPIView,
+    UserDetailView,
+    UserListCreateView,
     UserViewSet,
 )
 
