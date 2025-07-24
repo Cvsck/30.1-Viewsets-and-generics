@@ -51,7 +51,7 @@ class LessonListCreate(generics.ListCreateAPIView):
             permission_classes = [IsAuthenticated]
         return [permission() for permission in permission_classes]
 
-    def get_queryset():  # ✅ ОГРАНИЧЕНИЕ ВИДИМОСТИ
+    def get_queryset(self):  # ✅ ОГРАНИЧЕНИЕ ВИДИМОСТИ
         qs = super().get_queryset()
         if self.request.user.groups.filter(name="moderators").exists():
             return qs
