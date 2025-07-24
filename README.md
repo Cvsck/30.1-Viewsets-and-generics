@@ -41,3 +41,6 @@ python manage.py startapp users
 python manage.py startapp education
 
 pip install djangorestframework-simplejwt
+pip install pytest
+pip install pytest-django
+pip install coverage
