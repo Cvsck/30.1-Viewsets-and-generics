@@ -1,13 +1,13 @@
 from rest_framework import serializers
 
 from .models import Course, Lesson, Subscription
-from .validators import validate_youtube_url  # ✅ ДОБАВЛЕНО
+from .validators import VideoURLValidator  # ✅ Класс-валидатор
 
 
 class LessonSerializer(serializers.ModelSerializer):
     video_url = serializers.URLField(
-        validators=[validate_youtube_url]
-    )  # ✅ ВАЛИДАЦИЯ YOUTUBE
+        validators=[VideoURLValidator()]  # ✅ передаём экземпляр!
+    )
 
     class Meta:
         model = Lesson
@@ -18,13 +18,15 @@ class LessonSerializer(serializers.ModelSerializer):
 class FullCourseSerializer(serializers.ModelSerializer):
     lessons_count = serializers.SerializerMethodField()
     lessons = LessonSerializer(many=True, read_only=True)
-    is_subscribed = serializers.SerializerMethodField()  # ✅ ПОДПИСКА
+    is_subscribed = serializers.SerializerMethodField()
 
-    def get_lessons_count(self, instance):
+    def get_lessons_count(self, instance: Course) -> int:
         return instance.lessons.count()
 
-    def get_is_subscribed(self, instance):  # ✅ МЕТОД ПОДПИСКИ
-        user = self.context.get("request").user
+    def get_is_subscribed(self, instance: Course) -> bool:
+        request = self.context.get("request")
+        user = getattr(request, "user", None)
+
         if user and user.is_authenticated:
             return Subscription.objects.filter(user=user, course=instance).exists()
         return False
@@ -44,14 +46,16 @@ class FullCourseSerializer(serializers.ModelSerializer):
 
 class CourseSerializer(serializers.ModelSerializer):
     lessons_count = serializers.SerializerMethodField()
-    is_subscribed = serializers.SerializerMethodField()  # ✅ ПОДПИСКА
+    is_subscribed = serializers.SerializerMethodField()
 
     @staticmethod
-    def get_lessons_count(instance):
+    def get_lessons_count(instance: Course) -> int:
         return instance.lessons.count()
 
-    def get_is_subscribed(self, instance):  # ✅ МЕТОД ПОДПИСКИ
-        user = self.context.get("request").user
+    def get_is_subscribed(self, instance: Course) -> bool:
+        request = self.context.get("request")
+        user = getattr(request, "user", None)
+
         if user and user.is_authenticated:
             return Subscription.objects.filter(user=user, course=instance).exists()
         return False

@@ -1,3 +1,4 @@
+from django.db.models import Q
 from django.shortcuts import get_object_or_404
 from rest_framework import generics, viewsets
 from rest_framework.permissions import IsAuthenticated
@@ -28,11 +29,12 @@ class CourseViewSet(viewsets.ModelViewSet):
             permission_classes = [IsAuthenticated]
         return [permission() for permission in permission_classes]
 
-    def get_queryset(self):  # ✅ ОГРАНИЧЕНИЕ ВИДИМОСТИ
+    def get_queryset(self):
         qs = super().get_queryset()
-        if self.request.user.groups.filter(name="moderators").exists():
+        user = self.request.user
+        if user.groups.filter(name="moderators").exists():
             return qs
-        return qs.filter(owner=self.request.user)
+        return qs.filter(Q(owner=user) | Q(subscription__user=user)).distinct()
 
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
