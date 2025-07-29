@@ -17,6 +17,8 @@ class UserSerializer(serializers.ModelSerializer):
 
 # 🔹 Сериализатор для платежей
 class PaymentSerializer(serializers.ModelSerializer):
+    user = serializers.HiddenField(default=serializers.CurrentUserDefault())
+
     class Meta:
         model = Payment
         fields = "__all__"

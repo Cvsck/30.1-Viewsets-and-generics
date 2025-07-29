@@ -5,11 +5,12 @@ from django.db import models
 class Course(models.Model):
     title = models.CharField(max_length=255)
     preview = models.ImageField(upload_to="course_previews/", blank=True, null=True)
-    description = models.TextField()
+    description = models.TextField(blank=True)
+    price = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     owner = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
-        related_name="owned_courses",  # уникальное имя
+        related_name="owned_courses",
     )
 
     def __str__(self):

@@ -64,6 +64,9 @@ class Payment(models.Model):
     lesson = models.ForeignKey(Lesson, on_delete=models.SET_NULL, null=True, blank=True)
     amount = models.DecimalField(max_digits=8, decimal_places=2)
     method = models.CharField(max_length=10, choices=PAYMENT_METHODS)
+    stripe_product_id = models.CharField(max_length=255, blank=True)
+    stripe_price_id = models.CharField(max_length=255, blank=True)
+    stripe_session_url = models.URLField(blank=True)
 
     def __str__(self):
         return f"{self.user.email} — {self.amount}₽ — {self.method}"

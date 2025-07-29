@@ -1,6 +1,7 @@
 from django.urls import include, path
 from rest_framework.routers import DefaultRouter
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
+from .views import payment_success, payment_cancel
 
 from .views import (
     PaymentViewSet,
@@ -25,4 +26,6 @@ urlpatterns = [
     path("token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
     # ViewSet доступен по /api/user-set/
     path("", include(router.urls)),
+    path("payment/success/", payment_success, name="payment_success"),
+    path("payment/cancel/", payment_cancel, name="payment_cancel"),
 ]
