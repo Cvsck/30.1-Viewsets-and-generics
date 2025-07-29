@@ -44,3 +44,5 @@ pip install djangorestframework-simplejwt
 pip install pytest
 pip install pytest-django
 pip install coverage
+pip install drf-spectacular
+
