@@ -1,18 +1,21 @@
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
-from rest_framework import generics, viewsets, status
+from drf_spectacular.utils import extend_schema
+from rest_framework import generics, status, viewsets
+from rest_framework.generics import GenericAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from rest_framework.generics import GenericAPIView
-from drf_spectacular.utils import extend_schema
+
+from education.tasks import notify_subscribers  # ✅ Celery-задача для рассылки
 from users.permissions import IsModerator, IsOwner
 
 from .models import Course, Lesson, Subscription
 from .paginators import StandardPagination
-from .serializers import CourseSerializer, LessonSerializer, CourseSubscribeSerializer
+from .serializers import (CourseSerializer, CourseSubscribeSerializer,
+                          LessonSerializer)
 
 
-# ✅ КУРСЫ — CRUD + Подписка + Пагинация
+# ✅ КУРСЫ — CRUD + Подписка + Пагинация + Уведомления
 @extend_schema(tags=["Courses"])
 class CourseViewSet(viewsets.ModelViewSet):
     queryset = Course.objects.all()
@@ -39,6 +42,11 @@ class CourseViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
+
+    def update(self, request, *args, **kwargs):
+        response = super().update(request, *args, **kwargs)
+        notify_subscribers.delay(kwargs["pk"])  # ✅ асинхронная рассылка
+        return response
 
 
 # ✅ УРОКИ — список и создание

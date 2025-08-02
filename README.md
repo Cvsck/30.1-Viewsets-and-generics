@@ -46,4 +46,15 @@ pip install pytest-django
 pip install coverage
 pip install drf-spectacular
 pip install stripe
+pip install celery
+pip install eventlet
 
+pip install redis   
+pip install django-redis
+
+pip install django-celery-beat
+обязательно потом сделать миграции - python manage.py migrate
+worker:
+celery -A config worker -l info -P eventlet
+beat:
+celery -A config beat -l info
