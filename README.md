@@ -58,3 +58,11 @@ worker:
 celery -A config worker -l info -P eventlet
 beat:
 celery -A config beat -l info
+# Онлайн-обучение — запуск через Docker Compose
+
+## 🚀 Запуск проекта
+
+```bash
+docker compose up
+docker compose exec web python manage.py migrate
+docker compose exec web python manage.py createsuperuser
