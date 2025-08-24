@@ -1,12 +1,12 @@
-from rest_framework.permissions import BasePermission
+﻿from rest_framework.permissions import BasePermission
 
 
 class IsModerator(BasePermission):
     """
-    Проверяет, состоит ли пользователь в группе 'moderators'.
+    РџСЂРѕРІРµСЂСЏРµС‚, СЃРѕСЃС‚РѕРёС‚ Р»Рё РїРѕР»СЊР·РѕРІР°С‚РµР»СЊ РІ РіСЂСѓРїРїРµ 'moderators'.
 
-    ✅ Поддерживает инверсию через '~IsModerator()'.
-    Используется на уровне has_permission.
+    вњ… РџРѕРґРґРµСЂР¶РёРІР°РµС‚ РёРЅРІРµСЂСЃРёСЋ С‡РµСЂРµР· '~IsModerator()'.
+    РСЃРїРѕР»СЊР·СѓРµС‚СЃСЏ РЅР° СѓСЂРѕРІРЅРµ has_permission.
     """
 
     def has_permission(self, request, view):
@@ -17,7 +17,7 @@ class IsModerator(BasePermission):
         )
 
     def __invert__(self):
-        # Возвращает Permission, отрицающий принадлежность к модераторам
+        # Р’РѕР·РІСЂР°С‰Р°РµС‚ Permission, РѕС‚СЂРёС†Р°СЋС‰РёР№ РїСЂРёРЅР°РґР»РµР¶РЅРѕСЃС‚СЊ Рє РјРѕРґРµСЂР°С‚РѕСЂР°Рј
         class NotModerator(BasePermission):
             def has_permission(inner_self, request, view):
                 return not IsModerator().has_permission(request, view)
@@ -27,9 +27,9 @@ class IsModerator(BasePermission):
 
 class IsOwner(BasePermission):
     """
-    Проверяет, является ли пользователь владельцем объекта.
+    РџСЂРѕРІРµСЂСЏРµС‚, СЏРІР»СЏРµС‚СЃСЏ Р»Рё РїРѕР»СЊР·РѕРІР°С‚РµР»СЊ РІР»Р°РґРµР»СЊС†РµРј РѕР±СЉРµРєС‚Р°.
 
-    ✅ Используется на уровне объекта (retrieve/update/delete).
+    вњ… РСЃРїРѕР»СЊР·СѓРµС‚СЃСЏ РЅР° СѓСЂРѕРІРЅРµ РѕР±СЉРµРєС‚Р° (retrieve/update/delete).
     """
 
     def has_object_permission(self, request, view, obj):
@@ -38,8 +38,8 @@ class IsOwner(BasePermission):
 
 class IsModeratorOrOwner(BasePermission):
     """
-    ✅ Объединённая логика доступа:
-    разрешено, если пользователь — модератор или владелец объекта.
+    вњ… РћР±СЉРµРґРёРЅС‘РЅРЅР°СЏ Р»РѕРіРёРєР° РґРѕСЃС‚СѓРїР°:
+    СЂР°Р·СЂРµС€РµРЅРѕ, РµСЃР»Рё РїРѕР»СЊР·РѕРІР°С‚РµР»СЊ вЂ” РјРѕРґРµСЂР°С‚РѕСЂ РёР»Рё РІР»Р°РґРµР»РµС† РѕР±СЉРµРєС‚Р°.
     """
 
     def has_permission(self, request, view):

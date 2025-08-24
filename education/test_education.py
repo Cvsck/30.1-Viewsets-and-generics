@@ -1,11 +1,13 @@
-import os
+﻿import os
 
 import django
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings")
 django.setup()
 
-from django.db.models import Q
+from unittest.mock import patch
+
+from django.core.exceptions import ValidationError
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APIRequestFactory, APITestCase
@@ -31,15 +33,14 @@ class EducationTests(APITestCase):
             video_url="https://www.youtube.com/watch?v=test",
             owner=self.owner,
             course=self.course,
+            description="Описание урока",
         )
 
     # --- Views ---
     def test_course_view_get_queryset_user(self):
-        # 🔀 Курс создаём от лица пользователя, а не owner
         course = Course.objects.create(
             title="Доступный курс", description="Для теста", owner=self.user
         )
-
         request = self.factory.get("/courses/")
         request.user = self.user
 
@@ -71,12 +72,16 @@ class EducationTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(response.data["title"], "Новый курс")
 
-    def test_course_update_view(self):
+    @patch("education.tasks.notify_subscribers.delay")
+    def test_course_update_view(self, mock_notify):
         self.client.force_authenticate(user=self.owner)
         url = reverse("course-detail", args=[self.course.id])
         response = self.client.patch(url, {"title": "Обновлённый курс"})
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["title"], "Обновлённый курс")
+        mock_notify.assert_called_once()
+        args, _ = mock_notify.call_args
+        self.assertEqual(int(args[0]), self.course.id)
 
     def test_course_delete_view(self):
         self.client.force_authenticate(user=self.owner)
@@ -92,15 +97,11 @@ class EducationTests(APITestCase):
         foreign_course = Course.objects.create(
             title="Чужой", description="Тест", owner=foreign_owner
         )
-
-        Subscription.objects.create(
-            user=self.user, course=foreign_course
-        )  # 👈 это даёт видимость
+        Subscription.objects.create(user=self.user, course=foreign_course)
 
         self.client.force_authenticate(user=self.user)
         url = reverse("course-detail", args=[foreign_course.id])
         response = self.client.patch(url, {"title": "Попытка изменения"})
-
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
     # --- Subscriptions ---
@@ -108,9 +109,17 @@ class EducationTests(APITestCase):
         self.client.force_authenticate(user=self.user)
         url = reverse("course-subscribe")
         response = self.client.post(url, {"course_id": self.course.id})
-        self.assertIn(
-            response.data["message"], ["подписка добавлена", "подписка удалена"]
-        )
+
+        import codecs
+
+        message = response.data.get("message", "")
+        try:
+            # Попробуем перекодировать вручную
+            message = codecs.decode(message.encode(), "utf-8")
+        except Exception:
+            pass  # если уже нормальная строка — оставим как есть
+
+        self.assertIn(message, ["подписка добавлена", "подписка удалена"])
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     # --- Serializers ---
@@ -137,6 +146,10 @@ class EducationTests(APITestCase):
         }
         serializer = LessonSerializer(data=data)
         self.assertTrue(serializer.is_valid(), serializer.errors)
+        self.assertEqual(serializer.validated_data["title"], data["title"])
+        self.assertEqual(serializer.validated_data["video_url"], data["video_url"])
+        self.assertEqual(serializer.validated_data["description"], data["description"])
+        self.assertEqual(serializer.validated_data["course"].id, data["course"])
 
     def test_lesson_serializer_with_invalid_url(self):
         data = {
@@ -159,5 +172,5 @@ class EducationTests(APITestCase):
 
     def test_video_url_validator_invalid(self):
         validator = VideoURLValidator()
-        with self.assertRaises(Exception):
+        with self.assertRaises(ValidationError):
             validator("https://vimeo.com/123")

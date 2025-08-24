@@ -1,4 +1,4 @@
-from django.db.models import Q
+﻿from django.db.models import Q
 from django.shortcuts import get_object_or_404
 from drf_spectacular.utils import extend_schema
 from rest_framework import generics, status, viewsets
@@ -6,16 +6,15 @@ from rest_framework.generics import GenericAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
-from education.tasks import notify_subscribers  # ✅ Celery-задача для рассылки
+from education.tasks import notify_subscribers  # Celery-задача для рассылки
 from users.permissions import IsModerator, IsOwner
 
 from .models import Course, Lesson, Subscription
 from .paginators import StandardPagination
-from .serializers import (CourseSerializer, CourseSubscribeSerializer,
-                          LessonSerializer)
+from .serializers import CourseSerializer, CourseSubscribeSerializer, LessonSerializer
 
 
-# ✅ КУРСЫ — CRUD + Подписка + Пагинация + Уведомления
+# КУРСЫ — CRUD + Подписка + Пагинация + Уведомления
 @extend_schema(tags=["Courses"])
 class CourseViewSet(viewsets.ModelViewSet):
     queryset = Course.objects.all()
@@ -45,11 +44,11 @@ class CourseViewSet(viewsets.ModelViewSet):
 
     def update(self, request, *args, **kwargs):
         response = super().update(request, *args, **kwargs)
-        notify_subscribers.delay(kwargs["pk"])  # ✅ асинхронная рассылка
+        notify_subscribers.delay(str(kwargs["pk"]))  # Асинхронная рассылка
         return response
 
 
-# ✅ УРОКИ — список и создание
+# УРОКИ — список и создание
 @extend_schema(tags=["Lessons"])
 class LessonListCreate(generics.ListCreateAPIView):
     queryset = Lesson.objects.all()
@@ -74,7 +73,7 @@ class LessonListCreate(generics.ListCreateAPIView):
         serializer.save(owner=self.request.user)
 
 
-# ✅ УРОКИ — чтение, обновление, удаление
+# УРОКИ — чтение, обновление, удаление
 @extend_schema(tags=["Lessons"])
 class LessonRetrieveUpdateDelete(generics.RetrieveUpdateDestroyAPIView):
     queryset = Lesson.objects.all()
@@ -89,7 +88,7 @@ class LessonRetrieveUpdateDelete(generics.RetrieveUpdateDestroyAPIView):
         return [permission() for permission in permission_classes]
 
 
-# ✅ ПОДПИСКА НА КУРСЫ — исправленная для Swagger
+# ПОДПИСКА НА КУРС — исправленная для Swagger и корректной кодировки
 @extend_schema(
     tags=["Courses"],
     summary="Оформить или отменить подписку на курс",
@@ -115,7 +114,8 @@ class CourseSubscribeAPIView(GenericAPIView):
             message = "подписка добавлена"
 
         serializer = self.get_serializer(data={"course_id": course.id})
-        serializer.is_valid()  # Только для показа в Swagger
+        serializer.is_valid()  # Только для отображения в Swagger
         return Response(
-            {"message": message, "course_id": course.id}, status=status.HTTP_200_OK
+            {"message": message, "course_id": course.id},
+            status=status.HTTP_200_OK,
         )

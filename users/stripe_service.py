@@ -1,4 +1,4 @@
-import stripe
+﻿import stripe
 from django.conf import settings
 
 stripe.api_key = settings.STRIPE_SECRET_KEY
@@ -6,7 +6,7 @@ stripe.api_key = settings.STRIPE_SECRET_KEY
 
 def create_stripe_product(name, description=None):
     if not description:
-        description = "Описание недоступно"
+        description = "РћРїРёСЃР°РЅРёРµ РЅРµРґРѕСЃС‚СѓРїРЅРѕ"
     return stripe.Product.create(name=name, description=description)
 
 

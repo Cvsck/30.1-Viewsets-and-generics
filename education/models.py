@@ -1,4 +1,4 @@
-from django.conf import settings
+﻿from django.conf import settings
 from django.db import models
 
 
@@ -26,7 +26,7 @@ class Lesson(models.Model):
     owner = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
-        related_name="owned_lessons",  # тоже уникальное
+        related_name="owned_lessons",  # С‚РѕР¶Рµ СѓРЅРёРєР°Р»СЊРЅРѕРµ
     )
 
     def __str__(self):

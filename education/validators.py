@@ -1,4 +1,4 @@
-from django.core.exceptions import ValidationError
+﻿from django.core.exceptions import ValidationError
 
 
 class VideoURLValidator:
@@ -7,4 +7,6 @@ class VideoURLValidator:
             value.startswith("https://www.youtube.com")
             or value.startswith("https://youtu.be")
         ):
-            raise ValidationError("Можно использовать только ссылки на youtube.com")
+            raise ValidationError(
+                "РњРѕР¶РЅРѕ РёСЃРїРѕР»СЊР·РѕРІР°С‚СЊ С‚РѕР»СЊРєРѕ СЃСЃС‹Р»РєРё РЅР° youtube.com"
+            )

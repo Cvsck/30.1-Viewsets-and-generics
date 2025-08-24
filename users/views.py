@@ -1,5 +1,5 @@
-from django.contrib.auth import get_user_model
-from django.http import HttpResponse, JsonResponse  # ✅ добавлен импорт
+﻿from django.contrib.auth import get_user_model
+from django.http import HttpResponse, JsonResponse  # вњ… РґРѕР±Р°РІР»РµРЅ РёРјРїРѕСЂС‚
 from django_filters.rest_framework import DjangoFilterBackend
 from drf_spectacular.utils import extend_schema, extend_schema_view
 from rest_framework import filters, generics, viewsets
@@ -9,20 +9,23 @@ from users.permissions import IsModerator, IsModeratorOrOwner, IsOwner
 
 from .models import Payment
 from .serializers import PaymentSerializer, RegisterSerializer, UserSerializer
-from .stripe_service import (create_checkout_session, create_stripe_price,
-                             create_stripe_product)
+from .stripe_service import (
+    create_checkout_session,
+    create_stripe_price,
+    create_stripe_product,
+)
 
 User = get_user_model()
 
 
 @extend_schema_view(
     get=extend_schema(
-        summary="Получить информацию о себе",
-        description="Возвращает профиль текущего пользователя для личного кабинета.",
+        summary="РџРѕР»СѓС‡РёС‚СЊ РёРЅС„РѕСЂРјР°С†РёСЋ Рѕ СЃРµР±Рµ",
+        description="Р’РѕР·РІСЂР°С‰Р°РµС‚ РїСЂРѕС„РёР»СЊ С‚РµРєСѓС‰РµРіРѕ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ РґР»СЏ Р»РёС‡РЅРѕРіРѕ РєР°Р±РёРЅРµС‚Р°.",
     ),
     post=extend_schema(
-        summary="Создать пользователя",
-        description="Создание нового пользователя (в основном для админки или отладки).",
+        summary="РЎРѕР·РґР°С‚СЊ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ",
+        description="РЎРѕР·РґР°РЅРёРµ РЅРѕРІРѕРіРѕ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ (РІ РѕСЃРЅРѕРІРЅРѕРј РґР»СЏ Р°РґРјРёРЅРєРё РёР»Рё РѕС‚Р»Р°РґРєРё).",
     ),
 )
 class UserListCreateView(generics.ListCreateAPIView):
@@ -34,10 +37,10 @@ class UserListCreateView(generics.ListCreateAPIView):
 
 
 @extend_schema_view(
-    get=extend_schema(summary="Мой профиль"),
-    put=extend_schema(summary="Обновить профиль"),
-    patch=extend_schema(summary="Частично обновить профиль"),
-    delete=extend_schema(summary="Удалить аккаунт"),
+    get=extend_schema(summary="РњРѕР№ РїСЂРѕС„РёР»СЊ"),
+    put=extend_schema(summary="РћР±РЅРѕРІРёС‚СЊ РїСЂРѕС„РёР»СЊ"),
+    patch=extend_schema(summary="Р§Р°СЃС‚РёС‡РЅРѕ РѕР±РЅРѕРІРёС‚СЊ РїСЂРѕС„РёР»СЊ"),
+    delete=extend_schema(summary="РЈРґР°Р»РёС‚СЊ Р°РєРєР°СѓРЅС‚"),
 )
 class UserDetailView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = UserSerializer
@@ -48,8 +51,8 @@ class UserDetailView(generics.RetrieveUpdateDestroyAPIView):
 
 
 @extend_schema(
-    summary="Регистрация",
-    description="Создаёт нового пользователя через открытую точку.",
+    summary="Р РµРіРёСЃС‚СЂР°С†РёСЏ",
+    description="РЎРѕР·РґР°С‘С‚ РЅРѕРІРѕРіРѕ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ С‡РµСЂРµР· РѕС‚РєСЂС‹С‚СѓСЋ С‚РѕС‡РєСѓ.",
 )
 class RegisterAPIView(generics.CreateAPIView):
     queryset = User.objects.all()
@@ -58,8 +61,8 @@ class RegisterAPIView(generics.CreateAPIView):
 
 
 @extend_schema_view(
-    list=extend_schema(summary="Список пользователей"),
-    retrieve=extend_schema(summary="Профиль пользователя по ID"),
+    list=extend_schema(summary="РЎРїРёСЃРѕРє РїРѕР»СЊР·РѕРІР°С‚РµР»РµР№"),
+    retrieve=extend_schema(summary="РџСЂРѕС„РёР»СЊ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ РїРѕ ID"),
 )
 class UserViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = User.objects.all()
@@ -68,11 +71,13 @@ class UserViewSet(viewsets.ReadOnlyModelViewSet):
 
 
 @extend_schema_view(
-    list=extend_schema(summary="Мои платежи или все (для модератора)"),
-    create=extend_schema(summary="Создать платеж и Stripe-сессию"),
-    retrieve=extend_schema(summary="Получить платеж по ID"),
-    update=extend_schema(summary="Обновить платеж"),
-    destroy=extend_schema(summary="Удалить платеж"),
+    list=extend_schema(
+        summary="РњРѕРё РїР»Р°С‚РµР¶Рё РёР»Рё РІСЃРµ (РґР»СЏ РјРѕРґРµСЂР°С‚РѕСЂР°)"
+    ),
+    create=extend_schema(summary="РЎРѕР·РґР°С‚СЊ РїР»Р°С‚РµР¶ Рё Stripe-СЃРµСЃСЃРёСЋ"),
+    retrieve=extend_schema(summary="РџРѕР»СѓС‡РёС‚СЊ РїР»Р°С‚РµР¶ РїРѕ ID"),
+    update=extend_schema(summary="РћР±РЅРѕРІРёС‚СЊ РїР»Р°С‚РµР¶"),
+    destroy=extend_schema(summary="РЈРґР°Р»РёС‚СЊ РїР»Р°С‚РµР¶"),
 )
 class PaymentViewSet(viewsets.ModelViewSet):
     queryset = Payment.objects.all()
@@ -103,7 +108,7 @@ class PaymentViewSet(viewsets.ModelViewSet):
         product_id = create_stripe_product(name=course.title)
         price_id = create_stripe_price(
             product_id, amount=int(course.price * 100)
-        )  # Stripe требует в копейках
+        )  # Stripe С‚СЂРµР±СѓРµС‚ РІ РєРѕРїРµР№РєР°С…
         session_url = create_checkout_session(
             price_id=price_id,
             success_url="http://127.0.0.1:8000/api/users/payment/success/",
@@ -118,12 +123,17 @@ class PaymentViewSet(viewsets.ModelViewSet):
         )
 
 
-# ✅ Страницы успеха/отмены для Stripe
+# вњ… РЎС‚СЂР°РЅРёС†С‹ СѓСЃРїРµС…Р°/РѕС‚РјРµРЅС‹ РґР»СЏ Stripe
 def payment_success(request):
-    return JsonResponse({"status": "success", "message": "Платёж прошёл успешно ✅"})
+    return JsonResponse(
+        {"status": "success", "message": "РџР»Р°С‚С‘Р¶ РїСЂРѕС€С‘Р» СѓСЃРїРµС€РЅРѕ вњ…"}
+    )
 
 
 def payment_cancel(request):
     return JsonResponse(
-        {"status": "cancelled", "message": "❌ Оплата отменена или не удалась."}
+        {
+            "status": "cancelled",
+            "message": "вќЊ РћРїР»Р°С‚Р° РѕС‚РјРµРЅРµРЅР° РёР»Рё РЅРµ СѓРґР°Р»Р°СЃСЊ.",
+        }
     )
