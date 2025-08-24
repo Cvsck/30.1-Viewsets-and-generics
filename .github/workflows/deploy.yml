@@ -14,7 +14,7 @@ jobs:
           python-version: '3.10'
       - run: |
           pip install poetry
-          poetry install
+          poetry install --no-interaction --no-root
       - run: poetry run pytest
 
   deploy:
@@ -23,13 +23,20 @@ jobs:
     if: success()
     steps:
       - name: Deploy to server
-        uses: appleboy/ssh-action@master
+        uses: appleboy/ssh-action@v0.1.10
         with:
           host: ${{ secrets.SERVER_IP }}
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_KEY }}
           script: |
+            echo "📦 Pulling latest code..."
             cd /var/www/your_project
             git pull
+
+            echo "🧹 Stopping containers..."
             docker-compose down
-            docker-compose up -d --build
+
+            echo "🚀 Rebuilding and starting containers..."
+            timeout 60s docker-compose up -d --build
+
+            echo "✅ Deploy finished"
