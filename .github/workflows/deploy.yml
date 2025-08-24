@@ -8,20 +8,31 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-python@v4
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
         with:
-          python-version: '3.10'
-      - run: |
-          pip install poetry
-          poetry install --no-interaction --no-root
-      - run: poetry run pytest
+          python-version: '3.12'
+
+      - name: Install Poetry
+        run: pip install poetry
+
+      - name: Install dependencies
+        run: poetry install --no-interaction --no-root
+
+      - name: Run tests
+        run: poetry run pytest
 
   deploy:
     needs: test
     runs-on: ubuntu-latest
-    if: success()
+    if: ${{ success() }}
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
       - name: Deploy to server
         uses: appleboy/ssh-action@v0.1.10
         with:
@@ -31,12 +42,12 @@ jobs:
           script: |
             echo "📦 Pulling latest code..."
             cd /var/www/your_project
-            git pull
+            git pull origin main
 
             echo "🧹 Stopping containers..."
             docker-compose down
 
             echo "🚀 Rebuilding and starting containers..."
-            timeout 60s docker-compose up -d --build
+            docker-compose up -d --build
 
             echo "✅ Deploy finished"
