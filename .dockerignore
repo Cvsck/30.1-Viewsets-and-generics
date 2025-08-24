@@ -1,0 +1,24 @@
+# Исключаем локальное виртуальное окружение
+.venv/
+
+# Кэш Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Логи и временные файлы
+*.log
+*.sqlite3
+celerybeat-schedule*
+celery_tasks.log
+
+# IDE и системные файлы
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Тестовые отчёты
+htmlcov/
+.coverage

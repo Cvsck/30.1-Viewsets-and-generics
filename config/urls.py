@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
+from django.http import HttpResponse
 from django.urls import include, path
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 from rest_framework_simplejwt.views import (TokenObtainPairView,
@@ -23,6 +24,8 @@ urlpatterns = [
     # ✅ Эндпоинты приложений
     path("api/users/", include("users.urls")),
     path("api/education/", include("education.urls")),
+    path("", lambda request: HttpResponse("It works!")),
+
 ]
 
 # ✅ Статика и медиа в режиме DEBUG
