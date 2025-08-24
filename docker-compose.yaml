@@ -1,16 +1,21 @@
+version: "3.9"
+
 services:
   web:
     build: .
-    command: poetry run python manage.py runserver 0.0.0.0:8000
+    command: gunicorn config.wsgi:application --bind 0.0.0.0:8000
     volumes:
       - .:/app
     ports:
-      - "8000:8000"
+      - "8000:8000"  # внутренний порт, nginx будет проксировать сюда
     env_file:
       - .env
     depends_on:
       - db
       - redis
+    dns:
+      - 8.8.8.8
+      - 1.1.1.1
 
   db:
     image: postgres:15
@@ -49,6 +54,17 @@ services:
     depends_on:
       - redis
       - db
+
+  nginx:
+    image: nginx:latest
+    ports:
+      - "80:80"
+    volumes:
+      - ./docker/conf.d:/etc/nginx/conf.d
+    depends_on:
+      - web
+    restart: always
+
 
 volumes:
   postgres_data:

@@ -62,7 +62,46 @@ celery -A config beat -l info
 
 ## 🚀 Запуск проекта
 
-```bash
+'''
 docker compose up
 docker compose exec web python manage.py migrate
 docker compose exec web python manage.py createsuperuser
+
+# 📦 Cvsck / 30.1-Viewsets-and-generics — CI/CD + Docker + GitHub Actions
+
+# 🚀 Быстрый старт через командную строку
+
+# 1. Клонирование репозитория
+
+'''
+git clone git@github.com:Cvsck/30.1-Viewsets-and-generics.git
+cd 30.1-Viewsets-and-generics
+'''
+
+# Создание и проверка .env
+'''
+cp .env.example .env
+nano .env  
+'''
+# Запуск контейнеров
+'''
+docker-compose up -d --build
+'''
+# Проверка состояния
+'''
+docker ps
+docker-compose logs web
+'''
+# Миграции и статика
+'''
+docker-compose exec web python manage.py migrate
+docker-compose exec web python manage.py collectstatic --noinput
+'''
+# 🔐 SSH-деплой (если вручную)
+'''
+ssh -i ~/.ssh/id_rsa your-user@your-server-ip
+cd /var/www/30.1-Viewsets-and-generics
+git pull
+docker-compose down
+docker-compose up -d --build
+'''
