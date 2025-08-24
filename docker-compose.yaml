@@ -7,7 +7,7 @@ services:
     volumes:
       - .:/app
     ports:
-      - "8000:8000"  # внутренний порт, nginx будет проксировать сюда
+      - "8000:8000"
     env_file:
       - .env
     depends_on:
@@ -64,7 +64,6 @@ services:
     depends_on:
       - web
     restart: always
-
 
 volumes:
   postgres_data:

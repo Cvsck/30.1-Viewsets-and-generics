@@ -1,25 +1,38 @@
-# Используем официальный Python-образ
+# 🐍 Используем официальный Python-образ
 FROM python:3.13-slim
 
-# Отключаем создание .pyc-файлов и буферизацию вывода
-ENV PYTHONDONTWRITEBYTECODE 1
-ENV PYTHONUNBUFFERED 1
+# 🔧 Отключаем .pyc и буферизацию вывода
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1
 
-# Рабочая директория внутри контейнера
+# 📁 Рабочая директория
 WORKDIR /app
 
-# Устанавливаем Poetry
-RUN pip install --upgrade pip && pip install poetry
+# 🧪 Установка системных зависимостей
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    libpq-dev \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
 
-# Копируем только файлы зависимостей
+# 🧰 Установка Poetry
+RUN pip install --upgrade pip && pip install poetry==1.2.2
+
+# 📦 Копируем только зависимости
 COPY pyproject.toml poetry.lock ./
 
-# Устанавливаем зависимости
+# 🔒 Установка зависимостей без виртуального окружения
 RUN poetry config virtualenvs.create false \
     && poetry install --no-interaction --no-ansi
 
-# Копируем весь проект
+# 📁 Копируем весь проект
 COPY . .
 
-# Открываем порт 8000
+# 📄 Копируем .env, если он нужен в контейнере (опционально)
+# COPY .env .env
+
+# 🔥 Открываем порт
 EXPOSE 8000
+
+# 🧼 Очистка временных файлов (опционально)
+RUN find . -name '*.pyc' -delete
