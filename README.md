@@ -105,3 +105,16 @@ git pull
 docker-compose down
 docker-compose up -d --build
 '''
+## CI/CD
+
+- При push в ветки `main` или `develop` запускается GitHub Actions:
+  - Прогоняются тесты на двух версиях Python
+  - При успехе происходит автоматический деплой на сервер
+
+- Сервер: http://<IP>  
+  (замени на реальный IP)
+
+- Доступ осуществляется через SSH-ключ, хранящийся в GitHub Secrets:
+  - `SERVER_IP`
+  - `SSH_USER`
+  - `SSH_KEY`

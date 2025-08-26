@@ -11,7 +11,8 @@ from users.permissions import IsModerator, IsOwner
 
 from .models import Course, Lesson, Subscription
 from .paginators import StandardPagination
-from .serializers import CourseSerializer, CourseSubscribeSerializer, LessonSerializer
+from .serializers import (CourseSerializer, CourseSubscribeSerializer,
+                          LessonSerializer)
 
 
 # КУРСЫ — CRUD + Подписка + Пагинация + Уведомления

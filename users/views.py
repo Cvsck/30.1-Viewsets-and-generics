@@ -1,5 +1,6 @@
 ﻿from django.contrib.auth import get_user_model
-from django.http import HttpResponse, JsonResponse  # вњ… РґРѕР±Р°РІР»РµРЅ РёРјРїРѕСЂС‚
+from django.http import (HttpResponse,  # вњ… РґРѕР±Р°РІР»РµРЅ РёРјРїРѕСЂС‚
+                         JsonResponse)
 from django_filters.rest_framework import DjangoFilterBackend
 from drf_spectacular.utils import extend_schema, extend_schema_view
 from rest_framework import filters, generics, viewsets
@@ -9,11 +10,8 @@ from users.permissions import IsModerator, IsModeratorOrOwner, IsOwner
 
 from .models import Payment
 from .serializers import PaymentSerializer, RegisterSerializer, UserSerializer
-from .stripe_service import (
-    create_checkout_session,
-    create_stripe_price,
-    create_stripe_product,
-)
+from .stripe_service import (create_checkout_session, create_stripe_price,
+                             create_stripe_product)
 
 User = get_user_model()
 
