@@ -65,7 +65,8 @@ jobs:
   deploy:
     needs: test
     runs-on: ubuntu-latest
-    if: ${{ success() && github.ref == 'refs/heads/main' }}
+    if: ${{ github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop' || github.ref == 'refs/heads/feature') }}
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -78,13 +79,17 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           script: |
             echo "📦 Pulling latest code..."
-            cd /var/www/your_project
-            git pull origin main
+            cd /home/ubuntu/app
+            git pull origin develop
 
             echo "🧹 Stopping containers..."
             docker-compose down
 
             echo "🚀 Rebuilding and starting containers..."
             docker-compose up -d --build
+
+            echo "🧪 Running migrations and collecting static..."
+            docker-compose exec web python manage.py migrate
+            docker-compose exec web python manage.py collectstatic --noinput
 
             echo "✅ Deploy finished"

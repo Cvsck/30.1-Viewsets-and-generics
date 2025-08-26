@@ -1,4 +1,4 @@
-import logging
+﻿import logging
 from datetime import UTC, datetime
 
 from celery import shared_task
@@ -9,13 +9,13 @@ logger = logging.getLogger(__name__)
 
 @shared_task
 def sample_task():
-    logger.info("🎯 Celery is working!")
+    logger.info("рџЋЇ Celery is working!")
 
 
 @shared_task
 def beat_task():
     now = datetime.now(UTC)
-    logger.warning(f"📅 Beat task executed at {now.isoformat()}")
+    logger.warning(f"рџ“… Beat task executed at {now.isoformat()}")
 
 
 @shared_task
@@ -27,11 +27,11 @@ def notify_subscribers(course_id):
 
     for subscriber in subscribers:
         send_mail(
-            subject=f"Обновление курса: {course.title}",
-            message="Курс был обновлён. Проверьте новые материалы!",
+            subject=f"РћР±РЅРѕРІР»РµРЅРёРµ РєСѓСЂСЃР°: {course.title}",
+            message="РљСѓСЂСЃ Р±С‹Р» РѕР±РЅРѕРІР»С‘РЅ. РџСЂРѕРІРµСЂСЊС‚Рµ РЅРѕРІС‹Рµ РјР°С‚РµСЂРёР°Р»С‹!",
             from_email="noreply@yourdomain.com",
             recipient_list=[subscriber.user.email],
         )
         logger.info(
-            f"📨 Email sent to: {subscriber.user.email} for course: {course.title}"
+            f"рџ“Ё Email sent to: {subscriber.user.email} for course: {course.title}"
         )

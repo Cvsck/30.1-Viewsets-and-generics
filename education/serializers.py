@@ -1,13 +1,15 @@
-from rest_framework import serializers
+﻿from rest_framework import serializers
 
 from .models import Course, Lesson, Subscription
 from .validators import VideoURLValidator
 
 
-# ✅ Уроки — сериализатор с валидацией ссылки
+# вњ… РЈСЂРѕРєРё вЂ” СЃРµСЂРёР°Р»РёР·Р°С‚РѕСЂ СЃ РІР°Р»РёРґР°С†РёРµР№ СЃСЃС‹Р»РєРё
 class LessonSerializer(serializers.ModelSerializer):
     video_url = serializers.URLField(
-        validators=[VideoURLValidator()]  # проверка HTTPS-ссылки на видео
+        validators=[
+            VideoURLValidator()
+        ]  # РїСЂРѕРІРµСЂРєР° HTTPS-СЃСЃС‹Р»РєРё РЅР° РІРёРґРµРѕ
     )
 
     class Meta:
@@ -16,7 +18,7 @@ class LessonSerializer(serializers.ModelSerializer):
         read_only_fields = ["id"]
 
 
-# ✅ Курс + список уроков — полная детализация
+# вњ… РљСѓСЂСЃ + СЃРїРёСЃРѕРє СѓСЂРѕРєРѕРІ вЂ” РїРѕР»РЅР°СЏ РґРµС‚Р°Р»РёР·Р°С†РёСЏ
 class FullCourseSerializer(serializers.ModelSerializer):
     lessons_count = serializers.SerializerMethodField()
     lessons = LessonSerializer(many=True, read_only=True)
@@ -46,7 +48,7 @@ class FullCourseSerializer(serializers.ModelSerializer):
         return False
 
 
-# ✅ Курс без уроков — упрощённый вариант для списка
+# вњ… РљСѓСЂСЃ Р±РµР· СѓСЂРѕРєРѕРІ вЂ” СѓРїСЂРѕС‰С‘РЅРЅС‹Р№ РІР°СЂРёР°РЅС‚ РґР»СЏ СЃРїРёСЃРєР°
 class CourseSerializer(serializers.ModelSerializer):
     lessons_count = serializers.SerializerMethodField()
     is_subscribed = serializers.SerializerMethodField()
@@ -69,11 +71,13 @@ class CourseSerializer(serializers.ModelSerializer):
         return False
 
 
-# ✅ Подписка на курс — для CourseSubscribeAPIView
+# вњ… РџРѕРґРїРёСЃРєР° РЅР° РєСѓСЂСЃ вЂ” РґР»СЏ CourseSubscribeAPIView
 class CourseSubscribeSerializer(serializers.Serializer):
     course_id = serializers.IntegerField()
 
     def validate_course_id(self, value):
         if not Course.objects.filter(id=value).exists():
-            raise serializers.ValidationError("Курс с таким ID не найден.")
+            raise serializers.ValidationError(
+                "РљСѓСЂСЃ СЃ С‚Р°РєРёРј ID РЅРµ РЅР°Р№РґРµРЅ."
+            )
         return value
