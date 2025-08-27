@@ -34,7 +34,7 @@ jobs:
 
     strategy:
       matrix:
-        python-version: [3.12, 3.13]
+        python-version: [3.11]  # ✅ соответствует твоей VM
 
     steps:
       - name: Checkout code
@@ -65,7 +65,7 @@ jobs:
   deploy:
     needs: test
     runs-on: ubuntu-latest
-    if: github.event_name == 'push' && (github.ref == 'refs/heads/develop' || github.ref == 'refs/heads/main')
+    if: github.ref == 'refs/heads/develop' || github.ref == 'refs/heads/main'  # ✅ работает и при push, и при PR
 
     steps:
       - name: Checkout code
