@@ -1,38 +1,37 @@
-# 🐍 Используем официальный Python-образ
-FROM python:3.13-slim
+# Используем официальный Python-образ
+FROM python:3.11-slim
 
-# 🔧 Отключаем .pyc и буферизацию вывода
+# Устанавливаем переменные окружения
 ENV PYTHONDONTWRITEBYTECODE=1 \
-    PYTHONUNBUFFERED=1
+    PYTHONUNBUFFERED=1 \
+    PATH="/root/.local/bin:$PATH"
 
-# 📁 Рабочая директория
+# Рабочая директория внутри контейнера
 WORKDIR /app
 
-# 🧪 Установка системных зависимостей
+# Установка системных зависимостей
 RUN apt-get update && apt-get install -y \
     build-essential \
     libpq-dev \
+    python3-venv \
     curl \
     && rm -rf /var/lib/apt/lists/*
 
-# 🧰 Установка Poetry
-RUN pip install --upgrade pip && pip install poetry==1.2.2
+# Установка Poetry
+RUN curl -sSL https://install.python-poetry.org | python3 -
 
-# 📦 Копируем только зависимости
-COPY pyproject.toml poetry.lock ./
+# Копируем зависимости и метаданные проекта
+COPY pyproject.toml poetry.lock README.md ./
 
-# 🔒 Установка зависимостей без виртуального окружения
+# Установка зависимостей без создания виртуального окружения
 RUN poetry config virtualenvs.create false \
-    && poetry install --no-interaction --no-ansi
+    && poetry install --no-interaction --no-ansi --no-root
 
-# 📁 Копируем весь проект
+# Копируем весь проект
 COPY . .
 
-# 📄 Копируем .env, если он нужен в контейнере (опционально)
-# COPY .env .env
-
-# 🔥 Открываем порт
+# Открываем порт для Django
 EXPOSE 8000
 
-# 🧼 Очистка временных файлов (опционально)
-RUN find . -name '*.pyc' -delete
+# Команда запуска сервера
+CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
