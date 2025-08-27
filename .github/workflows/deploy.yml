@@ -65,7 +65,7 @@ jobs:
   deploy:
     needs: test
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/develop' || github.ref == 'refs/heads/main'  # ✅ работает и при push, и при PR
+    if: github.ref == 'refs/heads/develop' || github.ref == 'refs/heads/main'
 
     steps:
       - name: Checkout code
@@ -79,7 +79,8 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           script: |
             echo "📦 Pulling latest code..."
-            cd /home/maksim_1983/app   # ✅ путь обновлён
+            cd /home/maksim_1983/app
+            git reset --hard HEAD
             git pull origin develop
 
             echo "🧹 Stopping containers..."
@@ -89,7 +90,7 @@ jobs:
             docker-compose up -d --build
 
             echo "🧪 Running migrations and collecting static..."
-            docker-compose exec web python manage.py migrate
-            docker-compose exec web python manage.py collectstatic --noinput
+            docker-compose exec -T web python manage.py migrate
+            docker-compose exec -T web python manage.py collectstatic --noinput
 
             echo "✅ Deploy finished"
