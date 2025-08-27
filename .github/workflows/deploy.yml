@@ -79,7 +79,7 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           script: |
             echo "📦 Pulling latest code..."
-            cd /home/ubuntu/app
+            cd /home/maksim_1983/app   # ✅ путь обновлён
             git pull origin develop
 
             echo "🧹 Stopping containers..."
@@ -93,4 +93,3 @@ jobs:
             docker-compose exec web python manage.py collectstatic --noinput
 
             echo "✅ Deploy finished"
-  
