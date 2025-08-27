@@ -9,8 +9,9 @@ logger = logging.getLogger(__name__)
 
 @shared_task
 def deactivate_inactive_users():
-    from users.models import \
-        User  # РёРјРїРѕСЂС‚ РІРЅСѓС‚СЂРё С„СѓРЅРєС†РёРё вЂ” РґР»СЏ РёР·Р±РµР¶Р°РЅРёСЏ С†РёРєР»РѕРІ
+    from users.models import (
+        User,
+    )  # РёРјРїРѕСЂС‚ РІРЅСѓС‚СЂРё С„СѓРЅРєС†РёРё вЂ” РґР»СЏ РёР·Р±РµР¶Р°РЅРёСЏ С†РёРєР»РѕРІ
 
     threshold = now() - timedelta(days=30)
 
