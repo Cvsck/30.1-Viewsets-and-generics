@@ -1,120 +1,99 @@
-# 30.1-Viewsets-and-generics
+# 📚 30.1-Viewsets-and-generics
+"""
+Проект онлайн-обучения на Django + DRF с полной контейнеризацией и CI/CD через GitHub Actions.
+"""
 
+# 🧰 Установка и разработка без Docker
 
+# 🔧 Создание виртуального окружения
 
+# bash
+"""
 python -m venv venv
-.\venv\Scripts\Activate.ps1
+.\venv\Scripts\Activate.ps1  # для Windows
+source venv/bin/activate     # для Linux/macOS
+📦 Установка зависимостей
 pip install --upgrade pip
-pip install django djangorestframework
-pip install pillow
-
-pip install mypy flake8 black isort
-
-
-# mypy: проверка типов
-mypy .
-
-# flake8: стиль и ошибки
-flake8 .
-
-# black: автоформатирование
-black .
-
-# isort: сортировка импортов
-isort .
-
-
-после установки каждой зависимости 
-вводим команду pip freeze для добавления 
-в requirements.txt
-
-git branch
-
-python.exe -m pip install --upgrade pip
-
-pip freeze > requirements.txt
-
-
+pip install django djangorestframework pillow
 pip install psycopg2-binary
+pip install djangorestframework-simplejwt
+pip install pytest pytest-django coverage drf-spectacular stripe
+pip install celery eventlet redis django-redis django-celery-beat
+"""
 
+# 🧪 Инструменты качества кода
+"""
+pip install mypy flake8 black isort
+mypy .          # проверка типов
+flake8 .        # стиль и ошибки
+black .         # автоформатирование
+isort .         # сортировка импортов
+"""
+# 📄 Сохранение зависимостей
+"""
+pip freeze > requirements.txt
+🛠 Создание приложений
 python manage.py startapp users
 python manage.py startapp education
-
-pip install djangorestframework-simplejwt
-pip install pytest
-pip install pytest-django
-pip install coverage
-pip install drf-spectacular
-pip install stripe
-pip install celery
-pip install eventlet
-
-pip install redis   
-pip install django-redis
-
-pip install django-celery-beat
-обязательно потом сделать миграции - python manage.py migrate
-worker:
+⚙️ Миграции и запуск Celery
+python manage.py migrate
 celery -A config worker -l info -P eventlet
-beat:
 celery -A config beat -l info
-# Онлайн-обучение — запуск через Docker Compose
-
-## 🚀 Запуск проекта
-
-'''
-docker compose up
-docker compose exec web python manage.py migrate
-docker compose exec web python manage.py createsuperuser
-
-# 📦 Cvsck / 30.1-Viewsets-and-generics — CI/CD + Docker + GitHub Actions
-
-# 🚀 Быстрый старт через командную строку
-
-# 1. Клонирование репозитория
-
-'''
+"""
+# 🐳 Запуск через Docker Compose
+"""
+docker-compose up -d --build
+docker-compose exec web python manage.py migrate
+docker-compose exec web python manage.py createsuperuser
+docker-compose exec web python manage.py collectstatic --noinput
+"""
+# 📦 Быстрый старт
+"""
 git clone git@github.com:Cvsck/30.1-Viewsets-and-generics.git
 cd 30.1-Viewsets-and-generics
-'''
-
-# Создание и проверка .env
-'''
 cp .env.example .env
-nano .env  
-'''
-# Запуск контейнеров
-'''
+nano .env
 docker-compose up -d --build
-'''
-# Проверка состояния
-'''
+"""
+# 🔍 Проверка состояния
+"""
 docker ps
 docker-compose logs web
-'''
-# Миграции и статика
-'''
-docker-compose exec web python manage.py migrate
-docker-compose exec web python manage.py collectstatic --noinput
-'''
-# 🔐 SSH-деплой (если вручную)
-'''
+"""
+# 🔐 Ручной деплой через SSH
+"""
 ssh -i ~/.ssh/id_rsa your-user@your-server-ip
-cd /var/www/30.1-Viewsets-and-generics
-git pull
+cd /home/maksim_1983/app
+git reset --hard HEAD
+git pull origin develop
 docker-compose down
 docker-compose up -d --build
-'''
-## CI/CD
+"""
+# 🤖 CI/CD
+"""
+При push или pull request в ветки main и develop:
 
-- При push в ветки `main` или `develop` запускается GitHub Actions:
-  - Прогоняются тесты на двух версиях Python
-  - При успехе происходит автоматический деплой на сервер
+Прогоняются тесты на Python 3.11
 
-- Сервер: http://<IP>  
-  (замени на реальный IP)
+При успехе запускается автоматический деплой на сервер
 
-- Доступ осуществляется через SSH-ключ, хранящийся в GitHub Secrets:
-  - `SERVER_IP`
-  - `SSH_USER`
-  - `SSH_KEY`
+Сервер: http://158.160.187.237
+
+Доступ осуществляется через SSH-ключи, хранящиеся в GitHub Secrets:
+
+SERVER_IP
+
+SSH_USER
+
+SSH_KEY
+"""
+# 📂 Структура проекта
+"""
+├── config/               # Django конфигурация
+├── education/            # Основное приложение
+├── users/                # Пользовательская логика
+├── docker-compose.yml    # Контейнеризация
+├── Dockerfile            # Базовый образ
+├── pyproject.toml        # Poetry конфигурация
+├── .github/workflows/    # CI/CD пайплайн
+"""
